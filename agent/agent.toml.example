@@ -1,0 +1,10 @@
+# Copy to agent.toml next to where the agent runs, and fill in the two values from the
+# dashboard (Devices & sync > Local agent > Create agent key).
+cloud_url = "https://your-dashboard.vercel.app"
+api_key   = "zka_..."
+
+# Optional
+# data_dir = "C:/ProgramData/zkagent"   # queue database, config cache and logs (default: ./data)
+# initial_backfill_days = 90            # on first connection, import this many days of device history (0 = everything)
+# request_timeout_sec = 20
+# device_timeout_sec = 10

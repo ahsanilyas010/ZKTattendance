@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: zkagent
+Version: 0.1.0
+Summary: On-site connector: pulls punches from ZKTeco terminals and syncs them to the cloud dashboard
+Requires-Python: >=3.10
+Requires-Dist: pyzk==0.9
+Requires-Dist: requests>=2.31
+Requires-Dist: tzdata
+Provides-Extra: test
+Requires-Dist: pytest>=8; extra == "test"

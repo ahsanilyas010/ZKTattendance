@@ -1,0 +1,17 @@
+[Unit]
+Description=ZKTeco attendance sync agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/opt/zkagent/venv/bin/python -m zkagent run -c /opt/zkagent/agent.toml
+WorkingDirectory=/opt/zkagent
+Restart=always
+RestartSec=10
+# Runs unprivileged; only needs to reach the terminal and the internet.
+DynamicUser=yes
+StateDirectory=zkagent
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

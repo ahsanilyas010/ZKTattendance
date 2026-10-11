@@ -1,0 +1,6 @@
+pyzk==0.9
+requests>=2.31
+tzdata
+
+[test]
+pytest>=8

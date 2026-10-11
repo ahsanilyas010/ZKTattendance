@@ -1,0 +1,2 @@
+[console_scripts]
+zkagent = zkagent.main:cli
