@@ -8,6 +8,7 @@ export async function supabaseServer() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
+      db: { schema: 'attendance' },
       cookies: {
         getAll: () => store.getAll(),
         setAll: (list) => {

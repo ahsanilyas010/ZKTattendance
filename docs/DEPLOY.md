@@ -2,31 +2,40 @@
 
 About 20 minutes. You need a Supabase account, a Vercel account and this repository on GitHub.
 
-## 1. Create the database
+## 1. Database: the ABPO Command project
 
-1. In Supabase, **New project** (name it e.g. `attendance`, pick the region nearest the site). Save the database password.
-2. Open **SQL Editor**, paste the contents of `supabase/migrations/20261011000000_init.sql`, and run it.
-   (Or with the CLI: `supabase link --project-ref <ref> && supabase db push`.)
-3. Optional, to try the dashboard with sample data: run `supabase/seed_demo.sql` the same way.
+This system shares the existing Supabase project **ABPO Command** (ref `uvgekzergvtbvvhvuyyh`) and keeps
+everything in its own `attendance` schema, so the call-centre CRM tables in `public` are never touched.
 
-## 2. Create the admin login
+The schema is **already applied** (migrations `attendance_1_tables`, `attendance_2a_grants_rls`,
+`attendance_2b_function_storage_seed`). To set up a fresh project instead, run
+`supabase/migrations/20261011000000_init.sql` in the SQL Editor.
 
-1. **Authentication → Users → Add user → Create new user.** Enter your email and a strong password, tick *Auto Confirm User*.
-2. Mark that user as the administrator. In the SQL Editor run (with your email):
+**One manual step:** *Project Settings → API → Exposed schemas* → add `attendance` and save. Without it the
+dashboard cannot reach the tables.
 
-   ```sql
-   update auth.users
-   set raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"admin"}'
-   where email = 'you@example.com';
-   ```
+Optional sample data to try the dashboard before the terminal is connected: run `supabase/seed_demo.sql`.
 
-   Only this flag grants access to the data; a normal sign-up cannot set it.
-3. **Authentication → Sign In / Providers →** turn **off** *Allow new users to sign up*.
+## 2. Choose the attendance administrator
+
+Access is granted by a flag on an existing login, not by who can sign in. Pick the account you will use
+(for example your own) and run, with that email:
+
+```sql
+update auth.users
+set raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"admin"}'
+where email = 'you@example.com';
+```
+
+Nobody else gets in: CRM users keep their CRM roles (stored in `profiles`) and see no attendance data,
+and a normal sign-up cannot set this flag. Sign out and in again so the new flag is in your session.
+Leave *Allow new users to sign up* as it is, because the CRM shares that setting.
 
 ## 3. Collect the keys
 
-**Project Settings → API Keys:** the project URL, the *publishable* key, and the *secret* key.
-The secret key bypasses all security rules. Put it only in Vercel's environment variables.
+**Project Settings → API Keys:** the project URL (`https://uvgekzergvtbvvhvuyyh.supabase.co`), the
+*publishable* key, and the *secret* key. The secret key bypasses all security rules. Put it only in
+Vercel's environment variables, never in the browser or the repository.
 
 ## 4. Deploy the dashboard
 
@@ -45,7 +54,7 @@ The secret key bypasses all security rules. Put it only in Vercel's environment 
 ## 5. Start the scheduler (needed for absence checks, alerts, scheduled exports)
 
 Vercel's free plan only allows a daily cron, so a five-minute heartbeat comes from Supabase instead.
-**Database → Extensions:** enable `pg_cron` and `pg_net`. Then run (replace the two values):
+**Database → Extensions:** `pg_cron` and the vault are already on in this project; enable `pg_net`. Then run (replace the two values):
 
 ```sql
 select vault.create_secret('<the same CRON_SECRET>', 'attendance_cron_secret');
@@ -75,6 +84,7 @@ All lines should say `OK`. Then in the dashboard: **Settings →** set time zone
 
 ## Notes
 
-* **Backups:** Supabase free projects have no point-in-time backups. Use a paid plan, or schedule `pg_dump`, once the data matters.
+* **Shared project:** back up and upgrade it as one unit with the CRM. Attendance tables are dropped cleanly with `drop schema attendance cascade` if you ever move them.
+* **Backups:** check the project's plan for point-in-time backups, or schedule `pg_dump`, once the data matters.
 * **Limits:** the recompute service sends employee IDs in one request, fine up to roughly a thousand employees per site.
 * **Secrets:** the SMTP password is stored in the `settings` table, readable only with the secret key. It is never returned to the browser.

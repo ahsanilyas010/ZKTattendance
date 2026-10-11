@@ -16,7 +16,7 @@ any browser.
   [pyzk](https://github.com/fananimi/pyzk), so no vendor SDK is needed. Punches are written to a local
   SQLite queue first, so an internet outage loses nothing.
 * **web/** Next.js dashboard and API, deployed on Vercel.
-* **supabase/** Postgres schema (with row-level security), demo seed.
+* **supabase/** Postgres schema in its own `attendance` schema (so it can share a project with other apps), row-level security, demo seed.
 * **docs/** [DEPLOY](docs/DEPLOY.md) · [AGENT-SETUP](docs/AGENT-SETUP.md) · [RUNBOOK](docs/RUNBOOK.md)
 
 ## How the problems from ZKTime are handled
