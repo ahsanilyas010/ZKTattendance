@@ -9,3 +9,5 @@ __pycache__/
 agent/*.db
 agent/agent.toml
 .vercel/
+tsconfig.tsbuildinfo
+next-env.d.ts
