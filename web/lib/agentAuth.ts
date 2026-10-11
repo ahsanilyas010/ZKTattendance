@@ -12,8 +12,10 @@ export const sha256 = (s: string) => createHash('sha256').update(s).digest('hex'
 export async function authAgent(req: Request): Promise<AgentRow | NextResponse> {
   const key = req.headers.get('x-agent-key');
   if (!key) return NextResponse.json({ error: 'missing agent key' }, { status: 401 });
-  const { data } = await admin().from('agents').select('id,site_id,name,poll_interval_sec')
+  const { data, error } = await admin().from('agents').select('id,site_id,name,poll_interval_sec')
     .eq('api_key_hash', sha256(key)).maybeSingle();
+  // A database problem must not look like a bad key, or the agent would stop instead of retrying.
+  if (error) return NextResponse.json({ error: 'database unavailable' }, { status: 503 });
   if (!data) return NextResponse.json({ error: 'invalid agent key' }, { status: 401 });
   return data as AgentRow;
 }
