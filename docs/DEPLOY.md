@@ -61,6 +61,10 @@ any person you need to tell apart. Treat the key like a password: share it only 
 full access, pick a long passphrase, and change it in Vercel to sign every browser out. Wrong keys are slowed down
 and limited to 8 tries per 10 minutes per client, but that is a speed bump rather than a lock, so length matters.
 
+**A variable only takes effect on a deployment created after you saved it.** After adding or changing `ACCESS_KEY`
+(or any other variable), redeploy: Deployments → latest → ⋯ → Redeploy, or push any commit. If the login page says
+"Access key sign-in is not set up", the running deployment predates the variable, or the key is under 16 characters.
+
 ## 5. Start the scheduler (needed for absence checks, alerts, scheduled exports)
 
 Vercel's free plan only allows a daily cron, so a five-minute heartbeat comes from Supabase instead.
