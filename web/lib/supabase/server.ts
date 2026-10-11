@@ -1,8 +1,14 @@
 // Per-request client bound to the signed-in admin's session cookies. RLS applies.
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { hasAccessSession } from '../accessSession';
+import { admin } from './admin';
 
-export async function supabaseServer() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function supabaseServer(): Promise<SupabaseClient<any, 'attendance'>> {
+  // Access-key sessions have no Supabase user for row-level security, so they read as the server.
+  if (await hasAccessSession()) return admin();
   const store = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,5 +26,5 @@ export async function supabaseServer() {
         },
       },
     },
-  );
+  ) as unknown as SupabaseClient<any, 'attendance'>;
 }

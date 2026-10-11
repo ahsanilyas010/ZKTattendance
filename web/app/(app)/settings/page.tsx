@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { supabaseBrowser } from '@/lib/supabase/browser';
+import { isKeyMode, supabaseBrowser } from '@/lib/supabase/browser';
 import { PageHead, api, useLoad, useToast } from '@/components/ui';
 import { useSite } from '@/components/site';
 import { fmtDate } from '@/lib/format';
@@ -15,13 +15,15 @@ interface Holiday { id: number; holiday_date: string; name: string }
 
 export default function Settings() {
   const toast = useToast();
+  const [keyMode, setKeyMode] = useState(false);
+  useEffect(() => setKeyMode(isKeyMode()), []);
   return (
     <>
       <PageHead eyebrow="Email, time zone and calendar" title="Settings" />
       <General toast={toast.show} />
       <Email toast={toast.show} />
       <Holidays toast={toast.show} />
-      <Password toast={toast.show} />
+      {!keyMode && <Password toast={toast.show} />}
       {toast.node}
     </>
   );

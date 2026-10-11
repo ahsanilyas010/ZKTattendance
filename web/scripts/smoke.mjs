@@ -17,6 +17,8 @@ await check('admin API refuses anonymous callers', '/api/settings', {}, [401]);
 await check('Excel export refuses anonymous callers', '/api/export?from=2026-01-01&to=2026-01-02', {}, [401]);
 await check('agent API refuses a missing key', '/api/agent/config', {}, [401]);
 await check('agent API refuses a wrong key', '/api/agent/config', { headers: { 'x-agent-key': 'zka_wrong' } }, [401]);
+await check('data forwarder refuses anonymous callers', '/api/sb/rest/v1/employees', {}, [401]);
+await check('access-key login refuses a wrong key', '/api/access/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ key: 'definitely-not-the-key' }) }, [401, 503]);
 await check('cron endpoint refuses no secret', '/api/jobs/tick', {}, [401]);
 if (cronSecret) {
   await check('cron endpoint accepts the secret', '/api/jobs/tick', { headers: { authorization: `Bearer ${cronSecret}` } }, [200]);

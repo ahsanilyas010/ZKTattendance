@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from './supabase/server';
 import { admin } from './supabase/admin';
+import { hasAccessSession } from './accessSession';
 
 /** Defence in depth: the proxy already blocks signed-out calls, but every admin route re-checks. */
 export async function requireAdmin(): Promise<NextResponse | null> {
+  if (await hasAccessSession()) return null;
   const sb = await supabaseServer();
   const { data } = await sb.auth.getClaims();
   if (data?.claims?.app_metadata?.role !== 'admin') return NextResponse.json({ error: 'unauthorized' }, { status: 401 });

@@ -4,6 +4,7 @@ import { Chip, type Tone } from '@/components/ui';
 import { AutoRefresh } from '@/components/nav';
 import { addDays, dayOfWeek, localDate, zonedToUtc } from '@/lib/attendance';
 import { agentState } from '@/lib/agentStatus';
+import { listAgents } from '@/lib/agents';
 import { ago, fmtDate, fmtTime } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -25,13 +26,13 @@ export default async function Today() {
   const now = new Date();
   const today = localDate(now, tz);
 
-  const [{ data: emps }, { data: shifts }, { data: att }, { data: holiday }, { data: devices }, { data: agents }] = await Promise.all([
+  const [{ data: emps }, { data: shifts }, { data: att }, { data: holiday }, { data: devices }, agents] = await Promise.all([
     sb.from('employees').select('id,name,department,device_user_id,shift_id,join_date').eq('status', 'active').order('name'),
     sb.from('shift_schedules').select('*'),
     sb.from('daily_attendance').select('*').eq('work_date', today),
     sb.from('holidays').select('name').eq('holiday_date', today).maybeSingle(),
     sb.from('devices').select('id,name,status,last_seen_at,last_punch_at,location').eq('enabled', true).order('name'),
-    sb.rpc('list_agents'),
+    listAgents(),
   ]);
 
   const shiftById = new Map((shifts ?? []).map((s) => [s.id as number, s]));
@@ -60,7 +61,7 @@ export default async function Today() {
   const present = rows.filter((r) => r.status === 'present' || r.status === 'left');
   const pending = rows.filter((r) => r.status === 'pending');
   const offline = (devices ?? []).filter((d) => d.status === 'offline');
-  const agent = (agents ?? [])[0] as { last_seen_at: string | null; poll_interval_sec: number } | undefined;
+  const agent = agents[0];
   const st = agentState(agent);
   const tone = (s: string): Tone => (s === 'online' ? 'present' : s === 'offline' ? 'absent' : 'idle');
 

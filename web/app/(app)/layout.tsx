@@ -3,17 +3,18 @@ import { Nav, SignOut } from '@/components/nav';
 import { SiteProvider } from '@/components/site';
 import { agentState } from '@/lib/agentStatus';
 import { ago } from '@/lib/format';
+import { listAgents } from '@/lib/agents';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const sb = await supabaseServer();
-  const [{ data: site }, { data: agents }, { count: unbound }] = await Promise.all([
+  const [{ data: site }, agents, { count: unbound }] = await Promise.all([
     sb.from('sites').select('id,name,timezone').order('id').limit(1).single(),
-    sb.rpc('list_agents'),
+    listAgents(),
     sb.from('employees').select('id', { count: 'exact', head: true }).eq('status', 'active').is('device_user_id', null),
   ]);
-  const agent = (agents ?? [])[0] as { last_seen_at: string | null; poll_interval_sec: number } | undefined;
+  const agent = agents[0];
   const st = agentState(agent);
   const dot = st === 'online' ? 'var(--ok)' : st === 'stale' ? 'var(--bad)' : 'var(--idle)';
   const label = st === 'online' ? 'Agent online' : st === 'stale' ? 'Agent offline' : 'No agent yet';

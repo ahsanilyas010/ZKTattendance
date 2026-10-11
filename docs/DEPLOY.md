@@ -48,8 +48,18 @@ Vercel's environment variables, never in the browser or the repository.
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | publishable key |
    | `SUPABASE_SERVICE_ROLE_KEY` | secret key |
    | `CRON_SECRET` | a long random string, e.g. `openssl rand -hex 32` |
+   | `ACCESS_KEY` | optional: a passphrase you choose (16+ characters) for key sign-in, see below |
 
 3. Deploy, then open the URL and sign in.
+
+### Sign in with a shared access key (optional)
+
+Set `ACCESS_KEY` in Vercel and redeploy. The login page then asks for just that key: type it once per browser and
+that browser stays signed in for 90 days (a signed, HttpOnly cookie; the key itself is never stored in the browser).
+Email and password still works under *Use email and password instead*, which is the recommended route for
+any person you need to tell apart. Treat the key like a password: share it only with people who should have
+full access, pick a long passphrase, and change it in Vercel to sign every browser out. Wrong keys are slowed down
+and limited to 8 tries per 10 minutes per client, but that is a speed bump rather than a lock, so length matters.
 
 ## 5. Start the scheduler (needed for absence checks, alerts, scheduled exports)
 

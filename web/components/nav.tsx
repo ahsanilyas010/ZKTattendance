@@ -35,7 +35,11 @@ export function Nav({ badges }: { badges: Record<string, number> }) {
 
 export function SignOut() {
   return (
-    <button className="btn ghost small" onClick={async () => { await supabaseBrowser().auth.signOut(); window.location.href = '/login'; }}>
+    <button className="btn ghost small" onClick={async () => {
+      await fetch('/api/access/logout', { method: 'POST' }).catch(() => {});
+      await supabaseBrowser().auth.signOut().catch(() => {});
+      window.location.href = '/login';
+    }}>
       Sign out
     </button>
   );
