@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.env
+.env.local
+*.log
+__pycache__/
+*.pyc
+.venv/
+agent/*.db
+agent/agent.toml
+.vercel/
