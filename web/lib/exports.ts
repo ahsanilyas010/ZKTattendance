@@ -2,31 +2,9 @@ import ExcelJS from 'exceljs';
 import { admin } from './supabase/admin';
 import { getSettings } from './settings';
 import { fetchAll } from './recompute';
-import { addDays, dayOfWeek, dedupePunches, formatHours, localDate, localParts, zonedToUtc } from './attendance';
+import { addDays, dedupePunches, formatHours, localParts, zonedToUtc } from './attendance';
 
-export type DateRangeKey = 'today' | 'yesterday' | 'last7' | 'last_week' | 'last_month' | 'this_month';
-
-export function resolveRange(key: DateRangeKey, tz: string, now = new Date()): { from: string; to: string } {
-  const today = localDate(now, tz);
-  const [y, m] = today.split('-').map(Number);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  switch (key) {
-    case 'today': return { from: today, to: today };
-    case 'yesterday': { const d = addDays(today, -1); return { from: d, to: d }; }
-    case 'last7': return { from: addDays(today, -6), to: today };
-    case 'last_week': {
-      const back = (dayOfWeek(today) + 6) % 7; // days since Monday
-      const monday = addDays(today, -back - 7);
-      return { from: monday, to: addDays(monday, 6) };
-    }
-    case 'this_month': return { from: `${y}-${pad(m)}-01`, to: today };
-    case 'last_month': {
-      const py = m === 1 ? y - 1 : y; const pm = m === 1 ? 12 : m - 1;
-      const first = `${py}-${pad(pm)}-01`;
-      return { from: first, to: addDays(`${y}-${pad(m)}-01`, -1) };
-    }
-  }
-}
+export { resolveRange, type DateRangeKey } from './ranges';
 
 export interface ExportFilter {
   siteId: number; from: string; to: string;

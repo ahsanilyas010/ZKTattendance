@@ -33,6 +33,4 @@ export async function sendMail(smtp: SmtpSettings | null, mail: Mail): Promise<v
 export function render(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k: string) => String(vars[k] ?? ''));
 }
-
-export const parseRecipients = (s: string): string[] =>
-  s.split(/[,;\s]+/).map((x) => x.trim()).filter((x) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x));
+export { parseRecipients } from './ranges';
